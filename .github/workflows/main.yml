@@ -18,7 +18,7 @@ jobs:
       - name: Log in to GitHub Packages
         run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
         env:
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull image
         run: |
           docker pull ${{ env.IMAGE }}:latest || true
@@ -27,7 +27,7 @@ jobs:
           docker build \
             --cache-from ${{ env.IMAGE }}:latest \
             --tag ${{ env.IMAGE }}:latest \
-            --file ./project/Dockerfile.prod /
+            --file ./project/Dockerfile.prod \
             "./project"
       - name: Push image
         run: |
@@ -45,7 +45,7 @@ jobs:
       - name: Log in to GitHub Packages
         run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
         env:
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull image
         run: |
           docker pull ${{ env.IMAGE }}:latest || true
@@ -54,7 +54,7 @@ jobs:
           docker build \
             --cache-from ${{ env.IMAGE }}:latest \
             --tag ${{ env.IMAGE }}:latest \
-            --file ./project/Dockerfile.prod /
+            --file ./project/Dockerfile.prod \
             "./project"
       - name: Run container
         run: |
@@ -64,14 +64,14 @@ jobs:
             -e PORT=8765 \
             -e ENVIRONMENT=dev \
             -e DATABASE_URL=sqlite://sqlite.db \
-            -e DATAGASE_TEST_URL=sqlite://sqlite.db \
+            -e DATABASE_TEST_URL=sqlite://sqlite.db \
             -p 5003:8765 \
             ${{ env.IMAGE }}:latest
       - name: Pytest
-        run: docker exec web python -m pytest .
+        run: docker exec fastapi-tdd python -m pytest .
       - name: Flake8
-        run: docker exec web flake8 .
+        run: docker exec fastapi-tdd python -m flake8 .
       - name: Black
-        run: docker exec web black . --check
-      - name: Isort
-        run: docker exec web isort . --check-only
+        run: docker exec fastapi-tdd python -m black . --check
+      - name: isort
+        run: docker exec fastapi-tdd python -m isort . --check-only
