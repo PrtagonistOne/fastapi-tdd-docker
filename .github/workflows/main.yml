@@ -1,5 +1,5 @@
 name: Continuous Integration and Delivery
-
+permissions: read-all|write-all
 on: [push]
 
 env:
