@@ -18,7 +18,7 @@ jobs:
       - name: Log in to GitHub Packages
         run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
         env:
-          GITHUB_TOKEN: ${{ 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 }}
+          GITHUB_TOKEN: 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
       - name: Pull image
         run: |
           docker pull ${{ env.IMAGE }}:latest || true
@@ -45,7 +45,7 @@ jobs:
       - name: Log in to GitHub Packages
         run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
         env:
-          GITHUB_TOKEN: ${{ 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 }}
+          GITHUB_TOKEN: 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
       - name: Pull image
         run: |
           docker pull ${{ env.IMAGE }}:latest || true
