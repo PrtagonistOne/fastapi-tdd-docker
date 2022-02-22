@@ -35,8 +35,8 @@ async def read_all_summaries() -> List[SummarySchema]:
     return await crud.get_all()
 
 
-@router.delete("/{id}/", response_model=SummarySchema)
-async def delete_summary(id: int) -> dict:
+@router.delete("/{id}/", response_model=SummaryResponseSchema)
+async def delete_summary(id: int = Path(..., gt=0)) -> dict:
     summary = await crud.get(id)
     if not summary:
         raise HTTPException(status_code=404, detail="Summary not found")
