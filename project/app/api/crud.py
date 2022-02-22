@@ -26,7 +26,7 @@ async def get_all() -> List:
 
 
 async def delete(id: int) -> int:
-    summary = await TextSummary.filter(id=id).first().delete()
+    summary = await TextSummary.filter(id=id).delete()
     return summary
 
 
