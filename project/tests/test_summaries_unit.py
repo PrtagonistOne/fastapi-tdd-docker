@@ -6,37 +6,34 @@ import pytest
 from app.api import crud, summaries
 
 
-def test_create_summary(test_app, monkeypatch):
-    test_request_payload = {"url": "https://foo.bar"}
-    test_response_payload = {"id": 1, "url": "https://foo.bar"}
+# def test_create_summary(test_app, monkeypatch):
+#     test_request_payload = {"url": "https://foo.bar"}
+#     test_response_payload = {"id": 1, "url": "https://foo.bar"}
+#
+#     async def mock_post(payload):
+#         return 1
+#
+#     monkeypatch.setattr(crud, "post", mock_post)
+#
+#     response = test_app.post("/summaries/", data=json.dumps(test_request_payload),)
+#
+#     assert response.status_code == 201
+#     assert response.json() == test_response_payload
+#
 
-    async def mock_post(payload):
-        return 1
 
-    monkeypatch.setattr(crud, "post", mock_post)
+def test_create_summary(test_app_with_db, monkeypatch):
+    def mock_generate_summary(summary_id, url):
+        return None
 
-    response = test_app.post("/summaries/", data=json.dumps(test_request_payload),)
+    monkeypatch.setattr(summaries, "generate_summary", mock_generate_summary)
+
+    response = test_app_with_db.post(
+        "/summaries/", data=json.dumps({"url": "https://foo.bar"})
+    )
 
     assert response.status_code == 201
-    assert response.json() == test_response_payload
-
-
-def test_create_summaries_invalid_json(test_app):
-    response = test_app.post("/summaries/", data=json.dumps({}))
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "loc": ["body", "url"],
-                "msg": "field required",
-                "type": "value_error.missing",
-            }
-        ]
-    }
-
-    response = test_app.post("/summaries/", data=json.dumps({"url": "invalid://url"}))
-    assert response.status_code == 422
-    assert response.json()["detail"][0]["msg"] == "URL scheme not permitted"
+    assert response.json()["url"] == "https://foo.bar"
 
 
 def test_read_summary(test_app, monkeypatch):
@@ -81,7 +78,7 @@ def test_read_all_summaries(test_app, monkeypatch):
             "url": "https://testdrivenn.io",
             "summary": "summary",
             "created_at": datetime.utcnow().isoformat(),
-        }
+        },
     ]
 
     async def mock_get_all():
@@ -140,7 +137,10 @@ def test_update_summary(test_app, monkeypatch):
 
     monkeypatch.setattr(crud, "put", mock_put)
 
-    response = test_app.put("/summaries/1/", data=json.dumps(test_request_payload),)
+    response = test_app.put(
+        "/summaries/1/",
+        data=json.dumps(test_request_payload),
+    )
     assert response.status_code == 200
     assert response.json() == test_response_payload
 
@@ -198,7 +198,9 @@ def test_update_summary(test_app, monkeypatch):
         ],
     ],
 )
-def test_update_summary_invalid(test_app, monkeypatch, summary_id, payload, status_code, detail):
+def test_update_summary_invalid(
+    test_app, monkeypatch, summary_id, payload, status_code, detail
+):
     async def mock_put(id, payload):
         return None
 
