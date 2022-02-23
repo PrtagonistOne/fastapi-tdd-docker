@@ -1,5 +1,6 @@
 import json
 from functools import lru_cache
+
 import pytest
 
 from app.api import summaries
